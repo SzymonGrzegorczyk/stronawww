@@ -4,14 +4,6 @@
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-/* ---- touch targets: min 44px na mobile ---- */
-@media (max-width: 768px) {
-  .sek-btn, .sek-nav-link-mobile, .sek-faq-q, input[type="checkbox"] {
-    min-height: 44px;
-  }
-  .sek-nav-burger { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
-}
-
 :root {
   --navy:            #0D2240;
   --navy-mid:        #163459;
@@ -158,7 +150,7 @@ html { scroll-behavior: smooth; }
    HERO
    ========================================================================== */
 .sek-hero { background: var(--navy); color: var(--cream); padding: 160px 0 120px; position: relative; overflow: hidden; min-height: 90vh; display: flex; align-items: center; }
-.sek-hero-bg { position: absolute; inset: 0; background-image: url(assets/team-photo.webp); background-size: cover; background-position: center 35%; filter: grayscale(0.15); }
+.sek-hero-bg { position: absolute; inset: 0; background-image: url(team-photo.webp); background-size: cover; background-position: center 35%; filter: grayscale(0.15); }
 .sek-hero-tint { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(13,34,64,0.94) 0%, rgba(13,34,64,0.82) 50%, rgba(13,34,64,0.5) 100%); pointer-events: none; }
 .sek-hero-glow { position: absolute; top: -200px; right: -100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(201,168,76,0.22), transparent 60%); pointer-events: none; }
 .sek-hero-grain { position: absolute; inset: 0; opacity: 0.04; background-image: radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px); background-size: 3px 3px; pointer-events: none; }
@@ -230,7 +222,7 @@ html { scroll-behavior: smooth; }
 .sek-about { background: var(--cream-warm); }
 .sek-about-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 72px; align-items: center; }
 .sek-about-photo { position: relative; }
-.sek-about-photo-img { aspect-ratio: 4/5; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-3); border: 0.5px solid var(--line); background-image: url(assets/team-full.webp); background-size: cover; background-position: center 25%; }
+.sek-about-photo-img { aspect-ratio: 4/5; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-3); border: 0.5px solid var(--line); background-image: url(team-full.webp); background-size: cover; background-position: center 25%; }
 .sek-about-badge { position: absolute; bottom: -22px; left: -22px; background: var(--navy); color: var(--cream); padding: 20px 26px; border-radius: 14px; box-shadow: var(--shadow-4); border: 1px solid rgba(201,168,76,0.3); max-width: 240px; }
 .sek-about-badge .sek-eye { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 6px; }
 .sek-about-badge .sek-name { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1.2; margin-bottom: 4px; }
@@ -278,10 +270,6 @@ html { scroll-behavior: smooth; }
   background-size: cover; background-position: center top;
   flex-shrink: 0;
 }
-.sek-team-photo img {
-  width: 100%; height: 100%; object-fit: cover; object-position: center top;
-  display: block;
-}
 .sek-team-body { padding: 26px 28px 28px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
 .sek-team-role {
   font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
@@ -307,6 +295,10 @@ html { scroll-behavior: smooth; }
 .sek-root .sek-team-phone { color: var(--navy); }
 .sek-team-phone svg { color: var(--gold-deep); flex-shrink: 0; }
 .sek-team-phone:hover { color: var(--gold-deep); }
+@media (max-width: 900px) {
+  .sek-team-grid { grid-template-columns: 1fr; gap: 20px; max-width: 420px; margin: 0 auto; }
+}
+
 .sek-calc-disclaimer a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---- TOOL TABS (inside calc section) ---- */
@@ -526,84 +518,12 @@ html { scroll-behavior: smooth; }
   .sek-cta-grid { grid-template-columns: 1fr; gap: 40px; }
   .sek-contact-grid { grid-template-columns: 1fr; gap: 48px; }
   .sek-footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-  .sek-team-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
 }
-
-/* ---- MOBILE (≤560px) — poprawki szczegółowe ---- */
 @media (max-width: 560px) {
-  /* layout */
-  :root { --gutter: 16px; }
-  .sek-pad { padding: 48px 0; }
-
-  /* nav */
-  .sek-nav-inner { padding: 0 var(--gutter); min-height: 58px; }
-  .sek-nav-right { gap: 6px; }
-  .sek-btn.sek-btn-primary[style] { padding: 9px 12px !important; font-size: 12px !important; }
-
-  /* hero */
-  .sek-hero { padding: 80px 0 56px; }
-  .sek-hero h1 { font-size: clamp(32px, 9vw, 48px); }
-  .sek-hero .lead { font-size: 15px; }
-  .sek-hero-ctas { flex-direction: column; gap: 10px; width: 100%; }
-  .sek-hero-ctas .sek-btn { justify-content: center; width: 100%; }
-  .sek-hero-meta { flex-direction: column; gap: 6px; }
-  .sek-hero-meta-sep { display: none; }
-
-  /* trust */
-  .sek-trust-grid { grid-template-columns: 1fr 1fr; gap: 16px; padding: 28px var(--gutter); }
-  .sek-num { font-size: clamp(28px, 8vw, 40px); }
-
-  /* services */
-  .sek-services-head h2 { font-size: clamp(26px, 7vw, 40px); }
-  .sek-service { padding: 24px 20px; }
-
-  /* team */
-  .sek-team-grid { grid-template-columns: 1fr; gap: 24px; }
-  .sek-team-card img { max-height: 280px; object-fit: cover; }
-
-  /* calc / tool tabs */
-  .sek-tool-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
-  .sek-tool-tab { flex-shrink: 0; font-size: 13px; padding: 10px 14px; }
-
-  /* reviews marquee */
+  .sek-trust-grid { grid-template-columns: 1fr; }
+  .sek-footer-grid { grid-template-columns: 1fr; }
+  .sek-form-row { grid-template-columns: 1fr; }
   .sek-review { flex: 0 0 300px; width: 300px; padding: 22px; }
   .sek-marquee-track.left, .sek-marquee-track.right { animation-duration: 44s; }
-
-  /* cta banner */
-  .sek-cta-banner { padding: 48px 0; }
-  .sek-cta-banner h2 { font-size: clamp(28px, 8vw, 44px); }
-  .sek-cta-ctas { flex-direction: column; gap: 10px; }
-  .sek-cta-ctas .sek-btn { justify-content: center; width: 100%; }
-
-  /* contact / form */
-  .sek-form { padding: 24px 18px; }
-  .sek-form-row { grid-template-columns: 1fr; }
-  .sek-form-head h3 { font-size: 24px; }
-  .sek-contact h2 { font-size: clamp(24px, 7vw, 36px); }
-
-  /* FAQ */
-  .sek-faq-item { padding: 18px 16px; }
-
-  /* footer */
-  .sek-footer-grid { grid-template-columns: 1fr; gap: 28px; }
-  .sek-footer-bottom { flex-direction: column; gap: 6px; text-align: center; }
-
-  /* float cta */
   .sek-float-cta-label { display: none; }
-  .sek-float-cta { padding: 12px 14px; }
-
-  /* about section */
-  .sek-about-grid { gap: 32px; }
-  .sek-about-img { border-radius: 12px; }
-
-  /* section headings global */
-  .sek-services-head, .sek-section-head { padding: 0 4px; }
-  h2 { font-size: clamp(26px, 7.5vw, 42px); }
-}
-
-/* ---- bardzo małe ekrany (≤360px) ---- */
-@media (max-width: 360px) {
-  .sek-trust-grid { grid-template-columns: 1fr; }
-  .sek-hero h1 { font-size: 28px; }
-  .sek-num { font-size: 26px; }
 }
