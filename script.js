@@ -192,21 +192,31 @@
   /* ----- cookie consent ----- */
   (function () {
     const KEY = 'sek-cookie-accepted-v1';
-    if (localStorage.getItem(KEY) === 'yes') return;
     const banner = document.getElementById('sek-cookie');
     const cb = document.getElementById('sek-cookie-accept-cb');
     const btn = document.getElementById('sek-cookie-accept');
     if (!banner || !cb || !btn) return;
-    banner.hidden = false;
-    banner.classList.add('is-visible');
+
+    // Sprawdź czy już zaakceptowano — jeśli nie, pokaż banner
+    function isAccepted() {
+      try { return localStorage.getItem(KEY) === 'yes'; } catch (e) { return false; }
+    }
+
+    if (!isAccepted()) {
+      // Małe opóźnienie żeby nie migał przy ładowaniu
+      setTimeout(function () {
+        banner.classList.add('is-visible');
+      }, 300);
+    }
+
     cb.addEventListener('change', function () {
       btn.disabled = !cb.checked;
     });
+
     btn.addEventListener('click', function () {
       if (!cb.checked) return;
       try { localStorage.setItem(KEY, 'yes'); } catch (e) {}
       banner.classList.remove('is-visible');
-      banner.hidden = true;
     });
   })();
 })();
