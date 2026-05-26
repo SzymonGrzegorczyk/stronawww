@@ -203,11 +203,14 @@
 #kk-root .kk-sbox .kk-sv{font-family:'Playfair Display', Georgia, serif;font-size:22px;font-weight:700;color:var(--kb800);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;line-height:1.1}
 #kk-root .kk-sbox .kk-sv-red{color:var(--kr400)}
 
-#kk-root .kk-tbl-wrap{overflow-x:auto;padding:0 0 14px}
-#kk-root table.kk-amort{width:100%;border-collapse:collapse}
-#kk-root table.kk-amort th{padding:11px 14px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:600;color:var(--kg600);background:var(--kg50);border-bottom:1px solid var(--kg100);white-space:nowrap}
+#kk-root .kk-tbl-wrap{overflow:auto;max-height:560px;padding:0 0 14px;position:relative;border:1px solid var(--kg100);border-radius:8px}
+#kk-root table.kk-amort{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:780px}
+#kk-root table.kk-amort col.kk-c-m{width:62px}
+#kk-root table.kk-amort col.kk-c-amt{width:auto}
+#kk-root table.kk-amort col.kk-c-extra{width:110px}
+#kk-root table.kk-amort thead th{padding:11px 14px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;font-weight:600;color:var(--kg600);background:var(--kg50);border-bottom:1px solid var(--kg100);white-space:nowrap;position:sticky;top:0;z-index:5;box-shadow:0 1px 0 var(--kg100)}
 #kk-root table.kk-amort th:first-child{text-align:center}
-#kk-root table.kk-amort td{padding:9px 14px;text-align:right;font-variant-numeric:tabular-nums;font-size:12.5px;border-bottom:1px solid rgba(13,34,64,0.04);color:var(--kg900)}
+#kk-root table.kk-amort td{padding:9px 14px;text-align:right;font-variant-numeric:tabular-nums;font-size:12.5px;border-bottom:1px solid rgba(13,34,64,0.04);color:var(--kg900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #kk-root table.kk-amort td:first-child{text-align:center;font-weight:500;color:var(--kg600);font-size:11px}
 #kk-root table.kk-amort tbody tr:hover{background:var(--kb50)}
 #kk-root table.kk-amort .kk-ci{color:var(--kr400)}
@@ -470,10 +473,21 @@
     var rows = '', tp = 0, ti = 0, rem = loan, totalOverpay = 0, months = 0;
     var anyEarly = preps.some(function (e) { return e.strat === 'shorten' || e.keep; });
     var maxM = anyEarly ? term + 600 : term;
+    // "Skrócenie okresu" lock: once we've made a shorten/keep prepayment, the
+    // monthly installment must stay at this locked amount even after rem drops.
+    // Otherwise the standard kkAnn() recalc would shrink the installment and
+    // the "shorten" effect would not materialise.
+    var lockedPayment = origFixed; // current locked installment (equal-only)
+    var prevR = base;
     for (var m = 1; m <= maxM && rem > 0.005; m++) {
       var r = kkGetR(m, base, ch);
       var rcIdx = -1;
       if (kkRateChangesOn) { var chx = kkGetIR(); for (var j = 0; j < chx.length; j++) { if (chx[j].month === m) { rcIdx = j; break; } } }
+      // Re-lock annuity on rate change (so a new WIBOR drives a new installment)
+      if (type === 'equal' && Math.abs(r - prevR) > 1e-12) {
+        lockedPayment = kkAnn(rem, r, Math.max(1, term - m + 1));
+        prevR = r;
+      }
       var eShorten = 0, eReduce = 0, eKeepAmt = 0, hasKeep = false;
       for (var pi = 0; pi < preps.length; pi++) {
         var p = preps[pi];
@@ -483,32 +497,48 @@
           else if (p.strat === 'reduce' && p.keep) { hasKeep = true; eKeepAmt += p.amt; }
         }
       }
-      if (eReduce > 0) { rem = Math.max(0, rem - eReduce); totalOverpay += eReduce; }
-      if (eKeepAmt > 0) { rem = Math.max(0, rem - eKeepAmt); totalOverpay += eKeepAmt; }
+      // Apply prepayments to remaining principal
+      if (eReduce > 0) {
+        rem = Math.max(0, rem - eReduce); totalOverpay += eReduce;
+        // "Zmniejszenie raty" — recompute lockedPayment to drop the installment
+        if (type === 'equal') lockedPayment = kkAnn(rem, r, Math.max(1, term - m + 1));
+      }
+      if (eKeepAmt > 0) {
+        rem = Math.max(0, rem - eKeepAmt); totalOverpay += eKeepAmt;
+        // "Utrzymanie raty" — DO NOT change lockedPayment (we keep paying origFixed)
+      }
+      // Shorten prepayment: rem is dropped, lockedPayment stays unchanged
+      if (eShorten > 0) {
+        rem = Math.max(0, rem - eShorten); totalOverpay += eShorten;
+        // lockedPayment unchanged → shorter actual horizon
+      }
       var interest = rem * r;
       var principal, payment, extraDisplay = 0;
       if (type === 'equal') {
         if (hasKeep) {
-          var sched = kkAnn(rem, r, Math.max(1, term - m + 1));
-          var topUp = origFixed - sched; if (topUp < 0) topUp = 0;
-          payment = origFixed; principal = payment - interest;
-          if (principal > rem) { principal = rem; payment = interest + principal; topUp = 0; }
-          totalOverpay += topUp; extraDisplay = eKeepAmt + topUp;
-        } else if (eShorten > 0) {
-          payment = origFixed + eShorten; principal = payment - interest;
+          payment = origFixed;
+          principal = payment - interest;
           if (principal > rem) { principal = rem; payment = interest + principal; }
-          totalOverpay += eShorten; extraDisplay = eShorten;
+          extraDisplay = eKeepAmt;
         } else {
-          payment = kkAnn(rem, r, Math.max(1, term - m + 1)); principal = payment - interest;
+          payment = lockedPayment;
+          principal = payment - interest;
           if (principal > rem) { principal = rem; payment = interest + principal; }
-          extraDisplay = eReduce;
+          extraDisplay = eReduce + eShorten;
         }
       } else {
+        var basePrincipal = loan / term;
         var xtra = 0;
-        if (hasKeep) { var np = loan / term + rem * r; xtra = Math.max(0, origFixed - np); totalOverpay += xtra; extraDisplay = eKeepAmt + xtra; }
-        else if (eShorten > 0) { xtra = eShorten; totalOverpay += eShorten; extraDisplay = eShorten; }
-        else { extraDisplay = eReduce; }
-        principal = Math.min(loan / term + xtra, rem); payment = principal + interest;
+        if (hasKeep) {
+          var np = basePrincipal + rem * r;
+          xtra = Math.max(0, origFixed - np);
+          totalOverpay += xtra;
+          extraDisplay = eKeepAmt + xtra;
+        } else {
+          extraDisplay = eReduce + eShorten;
+        }
+        principal = Math.min(basePrincipal + xtra, rem);
+        payment = principal + interest;
       }
       var attr = rcIdx >= 0 ? ' data-rc' : '';
       rows += '<tr' + attr + '><td>' + m + '</td><td>' + kkFmt(rem) + '</td><td>' + kkFmt(payment) + '</td><td class="kk-cp">' + kkFmt(principal) + '</td><td class="kk-ci">' + kkFmt(interest) + '</td><td class="kk-co">' + (extraDisplay > 0.005 ? kkFmt(extraDisplay) : '—') + '</td>';
@@ -538,11 +568,12 @@
     if (hasPrepay && sd && sd.baselineTi !== undefined) {
       var savedInt = Math.max(0, sd.baselineTi - sd.mainTi);
       var savedMo = sd.baselineMonths - sd.mainMonths;
-      var roi = sd.totalOverpay > 0 ? savedInt / sd.totalOverpay * 100 : 0;
+      // % of total loan principal that the client saves on interest
+      var savingsPctLoan = sd.loan > 0 ? (savedInt / sd.loan * 100) : 0;
       var kpis = '<div class="kk-kpis">'
         + kkKpi('Oszczędność odsetek', kkFmt(savedInt) + ' PLN', savedInt > 0 ? '(−' + kkPct(savedInt, sd.baselineTi) + ' odsetek)' : 'brak oszczędności', 'tel')
         + kkKpi('Skrócenie okresu', savedMo > 0 ? savedMo + ' mies.' : 'bez zmiany', savedMo > 0 ? 'kredyt kończy się wcześniej' : 'ten sam termin', 'tel')
-        + kkKpi('Suma nadpłat', kkFmt(sd.totalOverpay) + ' PLN', roi > 0 ? 'zwrot: ' + roi.toFixed(1) + '%' : '', 'blu')
+        + kkKpi('Suma nadpłat', kkFmt(sd.totalOverpay) + ' PLN', savingsPctLoan > 0 ? 'oszczędność = ' + savingsPctLoan.toFixed(1) + '% kwoty kredytu' : '', 'blu')
         + kkKpi('Odsetki bez nadpłat', kkFmt(sd.baselineTi) + ' PLN', '', 'red')
         + kkKpi('Odsetki z nadpłatami', kkFmt(sd.mainTi) + ' PLN', '', 'gry')
         + kkKpi('Kwota kredytu', kkFmt(sd.loan) + ' PLN', '', 'gry')
@@ -568,7 +599,7 @@
         chart += '</div>';
       }
       if (savedInt > 0) {
-        var hlbl = 'oszczędność odsetek' + (savedMo > 0 ? ' · −' + savedMo + ' mies.' : roi > 0 ? ' · zwrot ' + roi.toFixed(1) + '%' : '');
+        var hlbl = 'oszczędność odsetek' + (savedMo > 0 ? ' · −' + savedMo + ' mies.' : '') + (savingsPctLoan > 0 ? ' · ' + savingsPctLoan.toFixed(1) + '% kwoty kredytu' : '');
         chart += '<div class="kk-highlight"><div class="kk-hico">' + ICO_COIN + '</div><div><div class="kk-hval">' + kkFmt(savedInt) + ' PLN</div><div class="kk-hlbl">' + hlbl + '</div></div></div>';
       }
       chart += '</div>';
@@ -592,10 +623,15 @@
         pills += '</div>';
       }
     }
-    var th = hasPrepay
-      ? '<th>Miesiąc</th><th>Zadłużenie pocz.</th><th>Rata</th><th>Kapitał</th><th>Odsetki</th><th>Nadpłata</th><th>Zadłużenie końc.</th>'
-      : '<th>Miesiąc</th><th>Zadłużenie pocz.</th><th>Rata</th><th>Kapitał</th><th>Odsetki</th><th>Zadłużenie końc.</th>';
-    rd.innerHTML = savHtml + simpleSumHtml + pills + '<div class="kk-tbl-wrap"><table class="kk-amort"><thead><tr>' + th + '</tr></thead><tbody>' + tableRows + '</tbody></table></div>';
+    var th, cols;
+    if (hasPrepay) {
+      th = '<th>Miesiąc</th><th>Zadłużenie pocz.</th><th>Rata</th><th>Kapitał</th><th>Odsetki</th><th>Nadpłata</th><th>Zadłużenie końc.</th>';
+      cols = '<col class="kk-c-m"><col class="kk-c-amt"><col class="kk-c-amt"><col class="kk-c-amt"><col class="kk-c-amt"><col class="kk-c-extra"><col class="kk-c-amt">';
+    } else {
+      th = '<th>Miesiąc</th><th>Zadłużenie pocz.</th><th>Rata</th><th>Kapitał</th><th>Odsetki</th><th>Zadłużenie końc.</th>';
+      cols = '<col class="kk-c-m"><col class="kk-c-amt"><col class="kk-c-amt"><col class="kk-c-amt"><col class="kk-c-amt"><col class="kk-c-amt">';
+    }
+    rd.innerHTML = savHtml + simpleSumHtml + pills + '<div class="kk-tbl-wrap"><table class="kk-amort"><colgroup>' + cols + '</colgroup><thead><tr>' + th + '</tr></thead><tbody>' + tableRows + '</tbody></table></div>';
     kkG('kk-resEmpty').style.display = 'none';
     rd.style.display = 'block';
   }
