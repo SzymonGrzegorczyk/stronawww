@@ -426,7 +426,7 @@
     }
     tbl += tr('Kwota', rfFi(r.aP) + ' zł', rfFi(r.bP) + ' zł', rfFi(r.bP) + ' zł');
     tbl += tr('Oprocentowanie', r.aR.toFixed(2) + '%', r.bR.toFixed(2) + '%', r.bR.toFixed(2) + '%');
-    tbl += '<tr><td>Okres</td><td class="rf-td-a">' + r.aM + ' mies.</td><td class="rf-td-b">' + r.bM + ' mies.</td><td class="rf-td-c"><span class="rf-c-purple">' + r.cM + ' mies. (\u22122' + (r.aM - r.cM) + ')</span></td></tr>';
+    tbl += '<tr><td>Okres</td><td class="rf-td-a">' + r.aM + ' mies.</td><td class="rf-td-b">' + r.bM + ' mies.</td><td class="rf-td-c"><span class="rf-c-purple">' + r.cM + ' mies. (\u2212' + (r.aM - r.cM) + ')</span></td></tr>';
     tbl += '<tr><td>Rata miesięczna</td><td class="rf-td-a">' + rfFmt(r.A.pmt) + ' zł</td><td class="rf-td-b"><span class="rf-c-green">' + rfFmt(r.B.pmt) + ' zł</span></td><td class="rf-td-c">' + (r.C.pmt < r.A.pmt ? '<span class="rf-c-green">' : '') + rfFmt(r.C.pmt) + ' zł' + (r.C.pmt < r.A.pmt ? '</span>' : '') + '</td></tr>';
     tbl += '<tr><td>Suma odsetek</td><td class="rf-td-a"><span class="rf-c-red">' + rfFmt(r.A.ti) + ' zł</span></td><td class="rf-td-b"><span class="rf-c-green">' + rfFmt(r.B.ti) + ' zł</span></td><td class="rf-td-c"><span class="rf-c-purple">' + rfFmt(r.C.ti) + ' zł</span></td></tr>';
     tbl += tr('Suma rat', rfFmt(r.A.tp) + ' zł', rfFmt(r.B.tp) + ' zł', rfFmt(r.C.tp) + ' zł');
@@ -443,7 +443,7 @@
     $('#rf-dual-savings').innerHTML =
       '<div class="rf-sav-box rf-blue-sav"><div class="rf-sav-ico">zł</div>'
       + '<div class="rf-sav-main"><div class="rf-sv">' + rfFmt(r.diffB.real) + ' zł</div>'
-      + '<div class="rf-sl">Oszczędność — okres bez zmian<br>Różnica raty: \u22122' + rfFmt(r.diffB.rata) + ' zł/mies.</div></div>'
+      + '<div class="rf-sl">Oszczędność — okres bez zmian<br>Różnica raty: \u2212' + rfFmt(r.diffB.rata) + ' zł/mies.</div></div>'
       + (r.pbB ? '<div class="rf-sav-badge">zwrot po ' + r.pbB + ' mies.</div>' : '')
       + '</div>'
       + '<div class="rf-sav-box rf-purple-sav"><div class="rf-sav-ico">\u23F1</div>'
@@ -457,11 +457,11 @@
     if (r.pbC && r.bCost > 0) { var lC = Math.floor(r.pbC / 12), mC = r.pbC % 12; pbHtml += '<div class="rf-payback-box"><strong>Próg opłacalności — skrócenie okresu</strong>Koszt ' + rfFmt(r.bCost) + ' zł zwróci się po <em>' + r.pbC + ' mies.' + (lC > 0 ? ' (' + lC + ' l.' + (mC ? ' ' + mC + ' m.' : '') + ')' : '') + '</em></div>'; } else pbHtml += '<div></div>';
     $('#rf-payback-row').innerHTML = pbHtml;
 
-    function dv(val, cls) { return '<td class="' + (val > 0 ? cls : 'rf-c-red') + '">' + (val >= 0 ? '\u22122' : '+') + rfFmt(Math.abs(val)) + ' zł</td>'; }
+    function dv(val, cls) { return '<td class="' + (val > 0 ? cls : 'rf-c-red') + '">' + (val >= 0 ? '\u2212' : '+') + rfFmt(Math.abs(val)) + ' zł</td>'; }
     var tH = '<thead><tr><th>Parametr</th><th>Obecny kredyt</th><th>Bez zmian okresu</th><th>Różnica B</th><th>Skrócenie (' + r.cM + ' mies.)</th><th>Różnica C</th></tr></thead><tbody>';
     var rows = [
       ['Rata miesięczna', rfFmt(r.A.pmt) + ' zł', rfFmt(r.B.pmt) + ' zł', r.diffB.rata, rfFmt(r.C.pmt) + ' zł', r.diffC.rata],
-      ['Okres', '' + r.aM + ' mies.', '' + r.bM + ' mies.', '', '' + r.cM + ' mies. (\u22122' + (r.aM - r.cM) + ')', ''],
+      ['Okres', '' + r.aM + ' mies.', '' + r.bM + ' mies.', '', '' + r.cM + ' mies. (\u2212' + (r.aM - r.cM) + ')', ''],
       ['Oprocentowanie', '' + r.aR.toFixed(2) + '%', '' + r.bR.toFixed(2) + '%', '', '' + r.bR.toFixed(2) + '%', ''],
       ['Suma odsetek', rfFmt(r.A.ti) + ' zł', rfFmt(r.B.ti) + ' zł', r.diffB.int, rfFmt(r.C.ti) + ' zł', r.diffC.int],
       ['Suma wszystkich rat', rfFmt(r.A.tp) + ' zł', rfFmt(r.B.tp) + ' zł', '', rfFmt(r.C.tp) + ' zł', ''],
