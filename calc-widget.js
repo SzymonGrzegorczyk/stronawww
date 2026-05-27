@@ -40,6 +40,8 @@
   --kgr600:#2F5610;
   font-family:'DM Sans', 'Inter', system-ui, sans-serif;
   color:var(--kg900);
+  max-width:100%;
+  overflow-x:hidden;
 }
 #kk-root .kk-hdr{
   background:linear-gradient(135deg,#1A3D6B 0%,#081628 100%);
@@ -70,10 +72,11 @@
   padding:24px;
   box-shadow:0 24px 56px rgba(13,34,64,0.12);
 }
-#kk-root .kk-layout{display:grid;grid-template-columns:320px 1fr;gap:22px;align-items:start}
-@media(max-width:820px){#kk-root .kk-layout{grid-template-columns:1fr}}
+#kk-root .kk-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:22px;align-items:start}
+#kk-root .kk-layout > *{min-width:0}
 
-#kk-root .kk-card{background:var(--kg50);border-radius:14px;border:1px solid var(--kg100);overflow:hidden;margin-bottom:14px}
+
+#kk-root .kk-card{background:var(--kg50);border-radius:14px;border:1px solid var(--kg100);overflow:visible;margin-bottom:14px}
 #kk-root .kk-card-hdr{padding:14px 18px;border-bottom:1px solid var(--kg100);display:flex;align-items:center;gap:10px;background:#fff}
 #kk-root .kk-card-icon{
   width:32px;height:32px;border-radius:8px;
@@ -112,7 +115,7 @@
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:11px 16px;border-radius:8px;font-family:'DM Sans', sans-serif;
   font-size:13px;font-weight:600;letter-spacing:0.01em;cursor:pointer;
-  border:none;white-space:nowrap;transition:all .2s;line-height:1;
+  border:none;white-space:normal;transition:all .2s;line-height:1.2;
 }
 #kk-root .kk-btn-primary{
   background:var(--kb400);color:var(--kb800);width:100%;padding:14px;font-size:14px;border-radius:10px;
@@ -129,7 +132,7 @@
 #kk-gpFields{display:none;padding:16px;background:var(--kb50);border-radius:10px;border:1px solid var(--kb100);margin-bottom:14px}
 #kk-root .kk-tr-rem{font-size:11px;color:var(--kt600);font-weight:500;margin-top:6px;font-variant-numeric:tabular-nums}
 
-#kk-root .kk-result-card{background:#fff;border-radius:14px;border:1px solid var(--kg100);overflow:hidden}
+#kk-root .kk-result-card{background:#fff;border-radius:14px;border:1px solid var(--kg100);overflow:visible;width:100%;box-sizing:border-box}
 #kk-root .kk-res-empty{padding:64px 20px;text-align:center}
 #kk-root .kk-res-empty .kk-ico{
   width:56px;height:56px;border-radius:50%;
@@ -153,7 +156,7 @@
 #kk-root .kk-sv-badge{background:var(--kb400);color:var(--kb800);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;letter-spacing:0.04em}
 
 #kk-root .kk-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--kg100)}
-@media(max-width:560px){#kk-root .kk-kpis{grid-template-columns:1fr 1fr}}
+
 #kk-root .kk-kpi{background:#fff;padding:16px 18px}
 #kk-root .kk-kpi .kk-kl{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;color:var(--kg400);margin-bottom:6px;line-height:1.3}
 #kk-root .kk-kpi .kk-kv{font-family:'Playfair Display', Georgia, serif;font-size:22px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
@@ -197,13 +200,13 @@
 #kk-root .kk-rate-pill{font-size:11px;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:999px;font-weight:600;letter-spacing:0.02em}
 
 #kk-root .kk-simple-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--kg100);border-bottom:1px solid var(--kg100)}
-@media(max-width:560px){#kk-root .kk-simple-sum{grid-template-columns:1fr}}
+
 #kk-root .kk-sbox{background:#fff;padding:16px 18px}
 #kk-root .kk-sbox .kk-sl{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;color:var(--kg400);margin-bottom:5px}
 #kk-root .kk-sbox .kk-sv{font-family:'Playfair Display', Georgia, serif;font-size:22px;font-weight:700;color:var(--kb800);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;line-height:1.1}
 #kk-root .kk-sbox .kk-sv-red{color:var(--kr400)}
 
-#kk-root .kk-tbl-wrap{overflow:auto;max-height:560px;padding:0 0 14px;position:relative;border:1px solid var(--kg100);border-radius:8px}
+#kk-root .kk-tbl-wrap{overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:560px;padding:0 0 14px;position:relative;border:1px solid var(--kg100);border-radius:8px;width:100%;display:block;box-sizing:border-box}
 #kk-root table.kk-amort{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:780px}
 #kk-root table.kk-amort col.kk-c-m{width:62px}
 #kk-root table.kk-amort col.kk-c-amt{width:auto}
@@ -252,6 +255,34 @@
   cursor:pointer;width:100%;margin-top:4px;transition:all .15s;
 }
 #kk-root .kk-add-btn:hover{background:var(--kb50);border-color:var(--kb400);border-style:solid}
+
+@media(max-width:900px){
+  #kk-root .kk-layout{grid-template-columns:minmax(0,1fr);gap:14px}
+}
+@media(max-width:600px){
+  #kk-root{max-width:100%;overflow:hidden;border-radius:14px}
+  #kk-root .kk-hdr{padding:20px 16px;border-radius:14px 14px 0 0}
+  #kk-root .kk-hdr h2{font-size:20px}
+  #kk-root .kk-shell{padding:12px 10px;border-radius:0 0 14px 14px}
+  #kk-root .kk-card-body{padding:12px}
+  #kk-root .kk-btn-group{display:flex;flex-direction:column;gap:8px}
+  #kk-root .kk-btn,#kk-root .kk-btn-primary{width:100%;max-width:100%;white-space:normal;text-align:center;justify-content:center}
+  #kk-root .kk-tbl-wrap{margin:0 -10px;border-radius:0;border-left:0;border-right:0;max-width:100vw}
+  #kk-root table.kk-amort{min-width:560px;font-size:11.5px}
+  #kk-root table.kk-amort th,#kk-root table.kk-amort td{padding:7px 8px}
+  #kk-root .kk-kpis{grid-template-columns:1fr}
+  #kk-root .kk-simple-sum{grid-template-columns:1fr}
+  #kk-root .kk-btn{width:100%}
+  #kk-root .kk-btn-primary{width:100%;font-size:14px}
+  #kk-root .kk-field input[type=number],#kk-root .kk-field select{font-size:16px}
+  #kk-root .kk-result-card{width:100%;max-width:100%}
+  #kk-root .kk-tbl-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;display:block;box-sizing:border-box}
+  #kk-root table.kk-amort{min-width:640px}
+  #kk-root table.kk-amort th,#kk-root table.kk-amort td{font-size:11px;padding:6px 8px;white-space:nowrap}
+  #kk-root .kk-kpis{grid-template-columns:1fr}
+  #kk-root .kk-simple-sum{grid-template-columns:1fr}
+}
+
 `;
 
   // -- HTML TEMPLATE ----------------------------------------------------------

@@ -1,0 +1,19 @@
+Options -Indexes
+AddDefaultCharset UTF-8
+
+RewriteEngine On
+
+# Jeśli plik lub katalog istnieje fizycznie — serwuj go
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Czyste URL sekcji → index.html (SPA routing)
+RewriteRule ^start$           /index.html [L]
+RewriteRule ^uslugi$          /index.html [L]
+RewriteRule ^o-nas$           /index.html [L]
+RewriteRule ^zespol$          /index.html [L]
+RewriteRule ^kalkulator$      /index.html [L]
+RewriteRule ^opinie$          /index.html [L]
+RewriteRule ^kontakt$         /index.html [L]
+RewriteRule ^konsultacje$     /index.html [L]

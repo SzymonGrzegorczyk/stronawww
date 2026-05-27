@@ -29,7 +29,19 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  /* ----- smooth scroll for in-page anchors ----- */
+  const sectionUrlMap = {
+    'home':     '/',
+    'services': '/uslugi',
+    'about':    '/o-nas',
+    'team':     '/zespol',
+    'calc':     '/kalkulator',
+    'reviews':  '/opinie',
+    'contact':  '/kontakt',
+  };
+  const urlSectionMap = {};
+  Object.keys(sectionUrlMap).forEach(function(k) { urlSectionMap[sectionUrlMap[k]] = k; });
+
+  /* ----- smooth scroll + czysty URL (/kontakt, /opinie itp.) ----- */
   document.querySelectorAll('[data-sek-scroll]').forEach(a => {
     a.addEventListener('click', function (e) {
       const targetId = this.getAttribute('data-sek-scroll');
@@ -38,9 +50,25 @@
       e.preventDefault();
       const top = el.getBoundingClientRect().top + window.scrollY - 60;
       window.scrollTo({ top, behavior: 'smooth' });
+      const cleanUrl = sectionUrlMap[targetId] || ('/#' + targetId);
+      history.pushState(null, '', cleanUrl);
       closeMobileMenu();
     });
   });
+
+  /* ----- wejście przez czysty URL (np. /kontakt) lub hash ----- */
+  (function () {
+    const path = window.location.pathname;
+    const hash = window.location.hash.replace('#', '');
+    const targetId = urlSectionMap[path] || hash;
+    if (!targetId || targetId === 'home') return;
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    setTimeout(function () {
+      const top = el.getBoundingClientRect().top + window.scrollY - 60;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }, 300);
+  })();
 
   /* ----- mobile menu ----- */
   const burger = document.querySelector('.sek-nav-burger');
@@ -103,18 +131,20 @@
       const dd = String(today.getDate()).padStart(2, '0');
       dateInput.min = `${yyyy}-${mm}-${dd}`;
     }
-    // generate inquiry label (date + time) + build personalized autoresponse
+    // generate inquiry number on submit + build personalized autoresponse
     contactForm.addEventListener('submit', function () {
       const now = new Date();
       const pad = (n) => String(n).padStart(2, '0');
-      const dateLabel = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}`;
-      const timeLabel = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-      const inquiryNo = `Zgłoszenie ${dateLabel}, godz. ${timeLabel}`;
+      const datePart = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+      const rand = Math.floor(Math.random() * 9000 + 1000); // 1000–9999
+      const inquiryNo = `SEK-${datePart}-${rand}`;
       const numField = contactForm.querySelector('input[name="Numer zgłoszenia"]');
       if (numField) numField.value = inquiryNo;
+      // mirror email into _replyto so FormSubmit replies go to the client
       const emailField = contactForm.querySelector('input[name="E-mail"]');
       const replyTo = contactForm.querySelector('input[name="_replyto"]');
       if (emailField && replyTo) replyTo.value = emailField.value;
+      // build personalized autoresponse for the client
       const nameField = contactForm.querySelector('input[name="Imię i nazwisko"]');
       const dateField = contactForm.querySelector('input[name="Preferowana data"]');
       const timeField = contactForm.querySelector('select[name="Preferowana godzina"]');
@@ -128,34 +158,30 @@
       const autoResp = [
         `Dzień dobry${niceName ? ' ' + niceName : ''},`,
         ``,
-        `serdecznie dziękujemy za kontakt ze Sprawdzonym Ekspertem Kredytowym!`,
+        `dziękujemy za zgłoszenie do Sprawdzonego Eksperta Kredytowego.`,
+        `Twoje zapytanie zostało zarejestrowane.`,
         ``,
-        `Twoje zgłoszenie zostało przyjęte i zarejestrowane.`,
-        ``,
-        `─────────────────────────────`,
+        `Numer zgłoszenia: ${inquiryNo}`,
         `Temat: ${niceTopic}`,
-        `Preferowany termin: ${niceDate}, godz. ${niceTime}`,
-        `─────────────────────────────`,
+        `Preferowany termin: ${niceDate}, ${niceTime}`,
         ``,
-        `Skontaktujemy się z Tobą w ciągu 24 godzin roboczych, aby potwierdzić`,
-        `termin spotkania i omówić dalsze kroki.`,
+        `Odezwiemy się do Ciebie w ciągu 24 godzin roboczych, aby potwierdzić wybrany termin spotkania i omówić dalsze kroki.`,
         ``,
-        `Jeśli sprawa jest pilna — zadzwoń bezpośrednio do naszego eksperta:`,
-        ``,
+        `Jeśli sprawa jest pilna — możesz zadzwonić bezpośrednio do jednego z naszych ekspertów:`,
+        `• Łukasz Wojda — 509 361 982`,
         `• Szymon Grzegorczyk — 505 868 808`,
-        `• Klaudia Sornat      — 504 092 923`,
+        `• Klaudia Sornat — 504 092 923`,
         ``,
-        `Do zobaczenia,`,
+        `Z pozdrowieniami,`,
         `Zespół Sprawdzony Ekspert Kredytowy`,
-        ``,
         `kontakt@sprawdzonyekspertkredytowy.pl`,
         `Stanisława Wyspiańskiego 1G/lok 1, 25-153 Kielce`,
-        `sprawdzonyekspertkredytowy.pl`,
       ].join('\n');
       const autoField = contactForm.querySelector('input[name="_autoresponse"]');
       if (autoField) autoField.value = autoResp;
+      // include the inquiry number in the e-mail subject sent to the office
       const subjField = contactForm.querySelector('input[name="_subject"]');
-      if (subjField) subjField.value = `Dziękujemy za zgłoszenie — Sprawdzony Ekspert Kredytowy`;
+      if (subjField) subjField.value = `[${inquiryNo}] Nowe zapytanie — ${niceTopic}`;
     });
   }
 
@@ -189,5 +215,25 @@
     }
   }
 
-
+  /* ----- cookie consent ----- */
+  (function () {
+    const KEY = 'sek-cookie-accepted-v1';
+    const banner = document.getElementById('sek-cookie');
+    const cb = document.getElementById('sek-cookie-accept-cb');
+    const btn = document.getElementById('sek-cookie-accept');
+    if (!banner || !cb || !btn) return;
+    // Chowaj baner jeśli zgoda już była
+    try {
+      if (localStorage.getItem(KEY) === 'yes') {
+        banner.classList.add('is-hidden');
+        return;
+      }
+    } catch (e) {}
+    // Przycisk działa bez checkboxa — kliknięcie akceptuje i chowa baner
+    btn.addEventListener('click', function () {
+      cb.checked = true;
+      try { localStorage.setItem(KEY, 'yes'); } catch (e) {}
+      banner.classList.add('is-hidden');
+    });
+  })();
 })();
