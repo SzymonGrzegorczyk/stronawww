@@ -103,20 +103,18 @@
       const dd = String(today.getDate()).padStart(2, '0');
       dateInput.min = `${yyyy}-${mm}-${dd}`;
     }
-    // generate inquiry number on submit + build personalized autoresponse
+    // generate inquiry label (date + time) + build personalized autoresponse
     contactForm.addEventListener('submit', function () {
       const now = new Date();
       const pad = (n) => String(n).padStart(2, '0');
-      const datePart = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
-      const rand = Math.floor(Math.random() * 9000 + 1000); // 1000–9999
-      const inquiryNo = `SEK-${datePart}-${rand}`;
+      const dateLabel = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}`;
+      const timeLabel = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      const inquiryNo = `Zgłoszenie ${dateLabel}, godz. ${timeLabel}`;
       const numField = contactForm.querySelector('input[name="Numer zgłoszenia"]');
       if (numField) numField.value = inquiryNo;
-      // mirror email into _replyto so FormSubmit replies go to the client
       const emailField = contactForm.querySelector('input[name="E-mail"]');
       const replyTo = contactForm.querySelector('input[name="_replyto"]');
       if (emailField && replyTo) replyTo.value = emailField.value;
-      // build personalized autoresponse for the client
       const nameField = contactForm.querySelector('input[name="Imię i nazwisko"]');
       const dateField = contactForm.querySelector('input[name="Preferowana data"]');
       const timeField = contactForm.querySelector('select[name="Preferowana godzina"]');
@@ -130,30 +128,34 @@
       const autoResp = [
         `Dzień dobry${niceName ? ' ' + niceName : ''},`,
         ``,
-        `dziękujemy za zgłoszenie do Sprawdzonego Eksperta Kredytowego.`,
-        `Twoje zapytanie zostało zarejestrowane.`,
+        `serdecznie dziękujemy za kontakt ze Sprawdzonym Ekspertem Kredytowym!`,
         ``,
-        `Numer zgłoszenia: ${inquiryNo}`,
+        `Twoje zgłoszenie zostało przyjęte i zarejestrowane.`,
+        ``,
+        `─────────────────────────────`,
         `Temat: ${niceTopic}`,
-        `Preferowany termin: ${niceDate}, ${niceTime}`,
+        `Preferowany termin: ${niceDate}, godz. ${niceTime}`,
+        `─────────────────────────────`,
         ``,
-        `Odezwiemy się do Ciebie w ciągu 24 godzin roboczych, aby potwierdzić wybrany termin spotkania i omówić dalsze kroki.`,
+        `Skontaktujemy się z Tobą w ciągu 24 godzin roboczych, aby potwierdzić`,
+        `termin spotkania i omówić dalsze kroki.`,
         ``,
-        `Jeśli sprawa jest pilna — możesz zadzwonić bezpośrednio do jednego z naszych ekspertów:`,
-        `• Łukasz Wojda — 509 361 982`,
+        `Jeśli sprawa jest pilna — zadzwoń bezpośrednio do naszego eksperta:`,
+        ``,
         `• Szymon Grzegorczyk — 505 868 808`,
-        `• Klaudia Sornat — 504 092 923`,
+        `• Klaudia Sornat      — 504 092 923`,
         ``,
-        `Z pozdrowieniami,`,
+        `Do zobaczenia,`,
         `Zespół Sprawdzony Ekspert Kredytowy`,
+        ``,
         `kontakt@sprawdzonyekspertkredytowy.pl`,
         `Stanisława Wyspiańskiego 1G/lok 1, 25-153 Kielce`,
+        `sprawdzonyekspertkredytowy.pl`,
       ].join('\n');
       const autoField = contactForm.querySelector('input[name="_autoresponse"]');
       if (autoField) autoField.value = autoResp;
-      // include the inquiry number in the e-mail subject sent to the office
       const subjField = contactForm.querySelector('input[name="_subject"]');
-      if (subjField) subjField.value = `[${inquiryNo}] Nowe zapytanie — ${niceTopic}`;
+      if (subjField) subjField.value = `Dziękujemy za zgłoszenie — Sprawdzony Ekspert Kredytowy`;
     });
   }
 
@@ -187,24 +189,5 @@
     }
   }
 
-  /* ----- cookie consent ----- */
-  (function () {
-    const KEY = 'sek-cookie-accepted-v1';
-    const banner = document.getElementById('sek-cookie');
-    const cb = document.getElementById('sek-cookie-accept-cb');
-    const btn = document.getElementById('sek-cookie-accept');
-    if (!banner || !cb || !btn) return;
-    // Jeśli zgoda była — ukryj natychmiast przez style
-    try {
-      if (localStorage.getItem(KEY) === 'yes') {
-        banner.style.display = 'none';
-        return;
-      }
-    } catch (e) {}
-    // Kliknięcie przycisku — ukryj przez style (niezależnie od CSS klas)
-    btn.addEventListener('click', function () {
-      try { localStorage.setItem(KEY, 'yes'); } catch (e) {}
-      banner.style.display = 'none';
-    });
-  })();
+
 })();
