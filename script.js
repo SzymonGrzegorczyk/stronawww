@@ -196,23 +196,16 @@
     const cb = document.getElementById('sek-cookie-accept-cb');
     const btn = document.getElementById('sek-cookie-accept');
     if (!banner || !cb || !btn) return;
-
-    // Sprawdź czy już zaakceptowano — jeśli nie, pokaż banner
-    function isAccepted() {
-      try { return localStorage.getItem(KEY) === 'yes'; } catch (e) { return false; }
+    try {
+      if (localStorage.getItem(KEY) !== 'yes') {
+        setTimeout(function () { banner.classList.add('is-visible'); }, 400);
+      }
+    } catch (e) {
+      setTimeout(function () { banner.classList.add('is-visible'); }, 400);
     }
-
-    if (!isAccepted()) {
-      // Małe opóźnienie żeby nie migał przy ładowaniu
-      setTimeout(function () {
-        banner.classList.add('is-visible');
-      }, 300);
-    }
-
     cb.addEventListener('change', function () {
       btn.disabled = !cb.checked;
     });
-
     btn.addEventListener('click', function () {
       if (!cb.checked) return;
       try { localStorage.setItem(KEY, 'yes'); } catch (e) {}
