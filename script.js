@@ -194,18 +194,17 @@
     const cb = document.getElementById('sek-cookie-accept-cb');
     const btn = document.getElementById('sek-cookie-accept');
     if (!banner || !cb || !btn) return;
-    // Chowaj baner jeśli zgoda już była
+    // Jeśli zgoda była — ukryj natychmiast przez style
     try {
       if (localStorage.getItem(KEY) === 'yes') {
-        banner.classList.add('is-hidden');
+        banner.style.display = 'none';
         return;
       }
     } catch (e) {}
-    // Przycisk działa bez checkboxa — kliknięcie akceptuje i chowa baner
+    // Kliknięcie przycisku — ukryj przez style (niezależnie od CSS klas)
     btn.addEventListener('click', function () {
-      cb.checked = true;
       try { localStorage.setItem(KEY, 'yes'); } catch (e) {}
-      banner.classList.add('is-hidden');
+      banner.style.display = 'none';
     });
   })();
 })();
