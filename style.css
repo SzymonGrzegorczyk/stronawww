@@ -150,7 +150,7 @@ html { scroll-behavior: smooth; }
    HERO
    ========================================================================== */
 .sek-hero { background: var(--navy); color: var(--cream); padding: 160px 0 120px; position: relative; overflow: hidden; min-height: 90vh; display: flex; align-items: center; }
-.sek-hero-bg { position: absolute; inset: 0; background-image: url(team-photo.webp); background-size: 115% auto; background-position: center 15%; background-repeat: no-repeat; filter: grayscale(0.15); }
+.sek-hero-bg { position: absolute; inset: 0; background-image: url(assets/team-photo.webp); background-size: 115% auto; background-position: center 15%; background-repeat: no-repeat; filter: grayscale(0.15); }
 .sek-hero-tint { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(13,34,64,0.94) 0%, rgba(13,34,64,0.82) 50%, rgba(13,34,64,0.5) 100%); pointer-events: none; }
 .sek-hero-glow { position: absolute; top: -200px; right: -100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(201,168,76,0.22), transparent 60%); pointer-events: none; }
 .sek-hero-grain { position: absolute; inset: 0; opacity: 0.04; background-image: radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px); background-size: 3px 3px; pointer-events: none; }
@@ -222,7 +222,7 @@ html { scroll-behavior: smooth; }
 .sek-about { background: var(--cream-warm); }
 .sek-about-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 72px; align-items: center; }
 .sek-about-photo { position: relative; }
-.sek-about-photo-img { aspect-ratio: 4/5; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-3); border: 0.5px solid var(--line); background-image: url(team-full.webp); background-size: cover; background-position: center 25%; }
+.sek-about-photo-img { aspect-ratio: 4/5; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-3); border: 0.5px solid var(--line); background-image: url(assets/team-full.webp); background-size: cover; background-position: center 25%; }
 .sek-about-badge { position: absolute; bottom: -22px; left: -22px; background: var(--navy); color: var(--cream); padding: 20px 26px; border-radius: 14px; box-shadow: var(--shadow-4); border: 1px solid rgba(201,168,76,0.3); max-width: 240px; }
 .sek-about-badge .sek-eye { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 6px; }
 .sek-about-badge .sek-name { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1.2; margin-bottom: 4px; }
@@ -567,29 +567,15 @@ html { scroll-behavior: smooth; }
   .sek-review { flex: 0 0 300px; width: 300px; padding: 22px; }
   .sek-marquee-track.left, .sek-marquee-track.right { animation-duration: 44s; }
   .sek-float-cta-label { display: none; }
-  .sek-hero { padding: 120px 0 80px; min-height: auto; }
-  .sek-form { padding: 28px 20px; }
-  .sek-about-badge { position: static; margin-top: 20px; max-width: 100%; border-radius: 12px; }
-  .sek-about-photo { position: static; }
-  .sek-faq-a p { padding-right: 0; }
-}
-@media (max-width: 400px) {
-  .sek-hero { padding: 100px 0 60px; }
-  .sek-hero h1 { font-size: 36px; }
-  .sek-form { padding: 20px 14px; }
-  .sek-form-head h3 { font-size: 26px; }
-  .sek-float-cta { bottom: 14px; right: 14px; padding: 14px 16px; min-width: 48px; min-height: 48px; justify-content: center; }
-  .sek-cta-stat-panel { padding: 24px 18px; }
-  .sek-pad { padding: 48px 0; }
 }
 
 
 /* ── COOKIE CONSENT ── */
 .sek-cookie {
   position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 60;
-  display: none;
+  display: block;
 }
-.sek-cookie.is-visible { display: block; }
+.sek-cookie.is-hidden { display: none; }
 .sek-cookie-box {
   max-width: 760px; margin: 0 auto;
   display: grid; grid-template-columns: auto 1fr auto; gap: 18px;

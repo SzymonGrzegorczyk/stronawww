@@ -196,20 +196,19 @@
     const cb = document.getElementById('sek-cookie-accept-cb');
     const btn = document.getElementById('sek-cookie-accept');
     if (!banner || !cb || !btn) return;
+    // Baner jest widoczny domyślnie w CSS — chowamy go tylko jeśli zgoda już była
     try {
-      if (localStorage.getItem(KEY) !== 'yes') {
-        setTimeout(function () { banner.classList.add('is-visible'); }, 400);
+      if (localStorage.getItem(KEY) === 'yes') {
+        banner.classList.add('is-hidden');
       }
-    } catch (e) {
-      setTimeout(function () { banner.classList.add('is-visible'); }, 400);
-    }
+    } catch (e) {}
     cb.addEventListener('change', function () {
       btn.disabled = !cb.checked;
     });
     btn.addEventListener('click', function () {
       if (!cb.checked) return;
       try { localStorage.setItem(KEY, 'yes'); } catch (e) {}
-      banner.classList.remove('is-visible');
+      banner.classList.add('is-hidden');
     });
   })();
 })();
